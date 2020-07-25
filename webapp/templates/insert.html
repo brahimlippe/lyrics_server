@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+form {
+  width: 500px;
+  clear: both;
+}
+
+input {
+  width: 100%;
+  clear: both;
+}
+
+textarea {
+  width: 100%;
+  clear: both;
+}
+    </style>
+    <title>New song</title>
+  </head>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  <ul>
+  {% for message in messages %}
+    <li>{{ message[1] }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
+{% endwith %}
+  <form action="" method="post"> {{ form.csrf }}
+    <div class="input text"> {{ form.title.label }} {{ form.title }}</div>
+    <div class="input text"> {{ form.lyrics.label }} {{ form.lyrics }}</div>
+    <div class="input submit"> <input type="submit" value="Submit"></div>
+  </form>
+</html>
