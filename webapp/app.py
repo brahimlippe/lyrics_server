@@ -8,8 +8,8 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config.from_object(__name__)
 
 class ReusableForm(Form):
-    title = TextField('Title:', validators=[validators.required()])
-    lyrics = TextAreaField('Lyrics:', validators=[validators.required()], render_kw={'cols': 80, 'rows': 40})
+    title = TextField('إسم:', validators=[validators.required()], render_kw={'placeholder':'إسم'})
+    lyrics = TextAreaField('كلمات:', validators=[validators.required()], render_kw={'cols': 80, 'rows': 20, 'placeholder':'كلمات'})
 
     @app.route("/new", methods=['GET', 'POST'])
     def insert():
@@ -24,10 +24,24 @@ class ReusableForm(Form):
                 print(title)
 
         if form.validate():
-            flash(title + ' inserted in database')
-        else:
-            flash('All the form fields are required. ')
-        return render_template('insert.html', form=form)
+            flash('زيدت الأغنية "' + title + '"')
+        return render_template('insert.html.j2', form=form)
+
+@app.route('/')
+def index():
+    return render_template('index.html.j2')
+
+@app.route('/contact')
+def contact():
+    return render_template("contact.html.j2")
+
+@app.route('/list', methods=['GET'])
+def list():
+    with sqlite3.connect("songs.sqlite") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * from song ORDER BY rowID")
+        songs = [(str(row[0]), row[1], row[2]) for row in cursor.fetchall()]
+        return render_template("list.html.j2", songs = songs)
 
 @app.route('/songs/<int:maxRowID>', methods=['GET'])
 def query(maxRowID):

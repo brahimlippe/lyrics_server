@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+  {% include 'header.html.j2' %}
+
+  <body>
+    <div class="container">
+      {% include 'menu.html.j2' %}
+      <form class="my-3" action="email.sh" id="contact" style="opacity:0.5">
+        <div class="form-row my-3">
+          <input class="form-control" type="email" placeholder="البريد الإلكتروني" id="from" />
+        </div>
+        <div class="form-row my-3">
+          <textarea class="form-control" id="message" placeholder="الرسالة" rows="8"></textarea>
+        </div>
+        <div class="form-row my-3">
+          <input type="submit" class="btn btn-secondary float-left" value="أرسل" />
+        </div>
+      </form>
+    </div>
+  </body>
+
+</html>
