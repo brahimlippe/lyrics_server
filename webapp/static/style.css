@@ -1,13 +1,3 @@
-/*Adress in footer is too big for small screens*/
-/*Replace it with smaller version for small screens*/
-@media (max-width: 750px) {
-    .address {
-       display: none;
-    }
-}
-.address-maps {
-    display: none;
-}
 @media (max-width: 750px) {
     .address-maps {
        display: block;
@@ -28,7 +18,7 @@ body {
     opacity: 1;
     animation: 1.5s ease-out 0s 1 fadeIn;
     animation-fill-mode: both;
-    background: url('kelimet.png') no-repeat fixed center top;
+    background: url('kelimet.png') no-repeat fixed center center;
 }
 
 /* Hover over manu items create a shadow*/
