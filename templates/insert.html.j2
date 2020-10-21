@@ -9,15 +9,6 @@
   <div class="alert alert-info alert-dismissible fade show" role="alert">
   <p class="text-center">إملأ الخانات التالية لزيادة أغنية. من المستحسن أن لا تكتب أبيات طويلة حتى يسهل قراءتها في شاشات صغيرة.</p>
   </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for message in messages %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {{ message[1] }}
-  </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
   <form style="opacity:0.5" class="mx-auto" action="" method="post"> {{ form.csrf }}
     <div class="form-row my-3 form-group"> {{ form.title }}</div>
     <div class="form-row my-3 form-group"> {{ form.lyrics }}</div>
