@@ -5,12 +5,12 @@
   <body>
     <div class="container">
       {% include 'menu.html.j2' %}
-      <form class="my-3" action="email.sh" id="contact" style="opacity:0.5">
+      <form class="my-3" action="/contact" style="opacity:0.5" method="post">
         <div class="form-row my-3">
-          <input class="form-control" type="email" placeholder="البريد الإلكتروني" id="from" />
+          <input class="form-control" type="email" placeholder="البريد الإلكتروني" name="from" required/>
         </div>
         <div class="form-row my-3">
-          <textarea class="form-control" id="message" placeholder="الرسالة" rows="8"></textarea>
+          <textarea class="form-control" name="message" placeholder="الرسالة" rows="8" required></textarea>
         </div>
         <div class="form-row my-3">
           <input type="submit" class="btn btn-secondary float-left" value="أرسل" />

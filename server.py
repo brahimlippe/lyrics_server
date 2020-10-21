@@ -1,6 +1,8 @@
 from flask import Flask, render_template, flash, request, send_file
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 from flask_sqlalchemy import SQLAlchemy
+from smtplib import SMTP
+from email.message import EmailMessage
 import os
 import json
 
@@ -35,8 +37,27 @@ def insert():
 @app.route('/')
 def index(): return render_template('index.html.j2')
 
-@app.route('/contact')
-def contact(): return render_template("contact.html.j2")
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        try:
+            with SMTP('smtp.gmail.com:587', timeout=5) as server:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login('brahimalekhine@gmail.com', 'alekhinebrahim')
+                email = EmailMessage()
+                body = f'Email: {request.form.get("from")}\r\n {request.form.get("message")}'
+                email.set_content(body)
+                email['From'] = 'noreply@poetic-feelings.com'
+                email['To'] = "brahim.pro@protonmail.com"
+                email['Subject'] = "Poetic feelings contact"
+                server.send_message(email)
+            flash("Message envoyé", "success")
+        except Exception as e:
+            app.logger.error(str(e))
+            flash("Une erreur technique est survenue, veuillez nous contacter par mail: brahim.pro@protonmail.com", "danger")
+    return render_template("contact.html.j2")
 
 @app.route('/list', methods=['GET'])
 def list(): return render_template("list.html.j2", songs = Song.query.all())
