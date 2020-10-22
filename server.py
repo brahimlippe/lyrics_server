@@ -3,6 +3,7 @@ from wtforms import Form, TextField, TextAreaField, validators, StringField, Sub
 from flask_sqlalchemy import SQLAlchemy
 from smtplib import SMTP
 from email.message import EmailMessage
+from sqlalchemy.ext.serializer import dumps
 import os
 import json
 
@@ -68,17 +69,13 @@ def query(maxRowID):
              for song in Song.query.filter(Song.songID > maxRowID)]
     return json.dumps({'songs': songs}, ensure_ascii=False)
 
-#@app.route('/songs.sqlite.dump', methods=['GET'])
-#def database_dump():
-#    with sqlite3.connect("songs.sqlite") as conn:
-#        cursor = conn.cursor()
-#        with open("songs.sqlite.dump", "w") as dump_file:
-#            for line in conn.iterdump():
-#                dump_file.write('%s\n' % line)
-#    return send_file('songs.sqlite.dump')
-#
-#@app.route('/songs.sqlite', methods=['GET'])
-#def database_file(): return send_file('songs.sqlite')
+@app.route('/songs.dump', methods=['GET'])
+def database_dump():
+    serialized_data = dumps(Song.query.all())
+    file_name = "songs.dump"
+    with open(file_name, "wb") as dump_file:
+        dump_file.write(serialized_data)
+    return send_file(file_name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
