@@ -5,9 +5,6 @@
   <body>
     <div class="container">
       {% include 'menu.html.j2' %}
-      <a href="https://github.com/brahimlippe/Lyrics/releases/download/latest/app-release.apk">
-        <p>رابط تنزيل البرنامج أندرويد</p>
-      </a>
       <form class="my-3" action="/contact" style="opacity:0.5" method="post">
         <div class="form-row my-3">
           <input class="form-control" type="email" placeholder="البريد الإلكتروني" name="from" required/>
@@ -19,6 +16,12 @@
           <input type="submit" class="btn btn-secondary float-left" value="أرسل" />
         </div>
       </form>
+      <a href="https://github.com/brahimlippe/Lyrics/releases/download/latest/app-release.apk">
+        <p>رابط تنزيل البرنامج أندرويد</p>
+      </a>
+      <a href="/songs.sqlite">
+        <p>تنزيل مخزن البيانات</p>
+      </a>
     </div>
   </body>
 

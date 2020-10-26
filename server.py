@@ -1,39 +1,34 @@
-from flask import Flask, render_template, flash, request, send_file
-from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, flash, request, send_file, redirect, url_for
 from smtplib import SMTP
 from email.message import EmailMessage
 from sqlalchemy.ext.serializer import dumps
 import os
 import json
+from sqlalchemy import Table, Column, Integer, String, MetaData, create_engine
 
 app = Flask(__name__)
 app.secret_key = os.urandom(16)
 app.config.from_object(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-db = SQLAlchemy(app)
 
-class Song(db.Model):
-    __tablename__ = 'Song'
-    songID = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable = False)
-    lyrics = db.Column(db.String, nullable = False)
-
-db.create_all()
-
-class NewSongForm(Form):
-    title = TextField('إسم:', validators=[validators.required()], render_kw={'placeholder':'إسم'})
-    lyrics = TextAreaField('كلمات:', validators=[validators.required()], render_kw={'cols': 80, 'rows': 20, 'placeholder':'كلمات'})
+engine = create_engine(os.environ['DATABASE_URL'], echo = True)
+meta = MetaData()
+songs = Table(
+   'song', meta,
+   Column('songID', Integer, primary_key = True),
+   Column('title', String),
+   Column('lyrics', String),
+)
+meta.create_all(engine)
 
 @app.route("/new", methods=['GET', 'POST'])
 def insert():
-    form = NewSongForm(request.form)
-    print(form.errors)
-    if request.method == 'POST' and form.validate():
-        db.session.add(Song(title=form.title.data, lyrics=form.lyrics.data))
-        db.session.commit()
-        flash('زيدت الأغنية "' + form.title.data + '"')
-    return render_template('insert.html.j2', form=form)
+    if request.method == 'POST':
+        query = songs.insert().values(title=request.form.get('title'),
+                                      lyrics=request.form.get('lyrics'))
+        conn = engine.connect()
+        conn.execute(query)
+        flash('زيدت الأغنية "' + request.form.get('title') + '"')
+    return render_template('insert.html.j2')
 
 @app.route('/')
 def index(): return render_template('index.html.j2')
@@ -61,20 +56,37 @@ def contact():
     return render_template("contact.html.j2")
 
 @app.route('/list', methods=['GET'])
-def list(): return render_template("list.html.j2", songs = Song.query.all())
+def list():
+    return render_template("list.html.j2", songs = engine.connect().execute(songs.select()))
 
 @app.route('/songs/<int:maxRowID>', methods=['GET'])
 def query(maxRowID):
-    songs = [{'songID': song.songID, 'title': song.title, 'lyrics': song.lyrics}
-             for song in Song.query.filter(Song.songID > maxRowID)]
-    return json.dumps({'songs': songs}, ensure_ascii=False)
+    query = engine.connect().execute(songs.select().where(songs.c.songID > maxRowID))
+    song_list = [{'songID': song.songID, 'title': song.title, 'lyrics': song.lyrics}
+                 for song in query]
+    return json.dumps({'songs': song_list}, ensure_ascii=False)
 
-@app.route('/songs.dump', methods=['GET'])
+@app.route('/songs.dump.sqlite', methods=['GET'])
 def database_dump():
-    serialized_data = dumps(Song.query.all())
-    file_name = "songs.dump"
-    with open(file_name, "wb") as dump_file:
-        dump_file.write(serialized_data)
+    file_name = './static/songs.dump.sqlite'
+    try:
+        os.remove(file_name)
+    except:
+        pass
+    sqlite_engine = create_engine('sqlite:///' + file_name)
+    sqlite_meta = MetaData()
+    sqlite_songs = Table(
+            'song', sqlite_meta,
+            Column('songID', Integer, primary_key = True),
+            Column('title', String),
+            Column('lyrics', String))
+    sqlite_meta.create_all(sqlite_engine)
+    for song in engine.connect().execute(songs.select()):
+        app.logger.info(song.title)
+        query = sqlite_songs.insert().values(title=song.title,
+                lyrics=song.lyrics,
+                songID=song.songID)
+        sqlite_engine.connect().execute(query)
     return send_file(file_name)
 
 if __name__ == '__main__':
