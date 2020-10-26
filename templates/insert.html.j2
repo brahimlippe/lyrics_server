@@ -11,10 +11,10 @@
   </div>
   <form style="opacity:0.5" class="mx-auto" action="" method="post">
     <div class="form-row my-3 form-group">
-      <input class="form-control" type="text" placeholder="إسم" name="title" required/>
+      <input class="form-control" type="text" placeholder="إسم" name="title" value="{{ title }}" required/>
     </div>
     <div class="form-row my-3 form-group">
-      <textarea class="form-control" name="lyrics" placeholder="كلمات" rows="15" cols="80" required></textarea>
+      <textarea class="form-control" name="lyrics" placeholder="كلمات" rows="15" cols="80" required>{{ lyrics }}</textarea>
     </div>
     <div class="form-row my-3 form-group">
           <input type="submit" class="btn btn-secondary float-left" value="أرسل" />

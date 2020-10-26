@@ -27,8 +27,24 @@ def insert():
                                       lyrics=request.form.get('lyrics'))
         conn = engine.connect()
         conn.execute(query)
-        flash('زيدت الأغنية "' + request.form.get('title') + '"')
+        flash('زيدت الأغنية "' + request.form.get('title') + '"', 'success')
     return render_template('insert.html.j2')
+
+@app.route("/modify/<int:id>", methods=['GET', 'POST'])
+def modify(id):
+    conn = engine.connect()
+    song_query = [song for song in conn.execute(songs.select().where(id == songs.c.songID))]
+    if len(song_query) == 0: return redirect(url_for('list'))
+    song = song_query[0]
+    lyrics = song.lyrics
+    title = song.title
+    if request.method == 'POST':
+        lyrics = request.form.get('lyrics')
+        title = request.form.get('title')
+        stmt = songs.update().where(songs.c.songID == id).values(title=title, lyrics=lyrics)
+        conn.execute(stmt)
+        flash('تم تغيير الأغنية "' + request.form.get('title') + '"', 'success')
+    return render_template('insert.html.j2', lyrics = lyrics, title = title)
 
 @app.route('/')
 def index(): return render_template('index.html.j2')

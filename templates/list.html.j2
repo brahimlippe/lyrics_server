@@ -15,7 +15,7 @@
       </thead>
       <tbody>
         {% for song in songs %}
-        <tr>
+        <tr onclick="transitionToPage('/modify/{{ song.songID }}')">
         <th scope="row">{{ song.songID }}</th>
         <td> {{ song.title }} </td>
         <td> {{ song.lyrics }} </td>
